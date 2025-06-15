@@ -1,7 +1,6 @@
 package dhcp
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
