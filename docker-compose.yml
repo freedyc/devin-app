@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  bind9:
+    image: internetsystemsconsortium/bind9:9.18
+    container_name: dns-server
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+      - "953:953/tcp"
+    volumes:
+      - ./configs/bind9:/etc/bind
+      - ./data/bind9:/var/lib/bind
+    restart: unless-stopped
+    command: ["named", "-g", "-c", "/etc/bind/named.conf", "-u", "bind"]
+
+  dhcp:
+    image: networkboot/dhcpd:latest
+    container_name: dhcp-server
+    ports:
+      - "67:67/udp"
+    volumes:
+      - ./configs/dhcp:/etc/dhcp
+      - ./data/dhcp:/var/lib/dhcp
+    restart: unless-stopped
+    network_mode: host
+
+  postgres:
+    image: postgres:15
+    container_name: dns-dhcp-db
+    environment:
+      POSTGRES_DB: dnsdhcp
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
