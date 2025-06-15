@@ -81,3 +81,6 @@ Thumbs.db
 
 # Docker
 .dockerignore
+*.log
+backend/dns-dhcp-server
+frontend/package-lock.json
