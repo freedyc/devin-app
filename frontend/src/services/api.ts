@@ -168,3 +168,73 @@ export const configApi = {
   validateBind9: () => api.get('/config/bind9/validate'),
   validateDHCP: () => api.get('/config/dhcp/validate'),
 }
+
+export const dnsEnhancedApi = {
+  getViews: () => api.get('/dns/enhanced/views'),
+  createView: (data: any) => api.post('/dns/enhanced/views', data),
+  deleteView: (id: number) => api.delete(`/dns/enhanced/views/${id}`),
+
+  getForwardingZones: () => api.get('/dns/enhanced/forwarding-zones'),
+  createForwardingZone: (data: any) => api.post('/dns/enhanced/forwarding-zones', data),
+  deleteForwardingZone: (id: number) => api.delete(`/dns/enhanced/forwarding-zones/${id}`),
+
+  getStubZones: () => api.get('/dns/enhanced/stub-zones'),
+  createStubZone: (data: any) => api.post('/dns/enhanced/stub-zones', data),
+  deleteStubZone: (id: number) => api.delete(`/dns/enhanced/stub-zones/${id}`),
+
+  getRecursionConfig: () => api.get('/dns/enhanced/recursion'),
+  updateRecursionConfig: (data: any) => api.put('/dns/enhanced/recursion', data),
+
+  deployDNSConfig: () => api.post('/dns/enhanced/deploy'),
+}
+
+export const deploymentApi = {
+  deploySystem: () => api.post('/deploy'),
+  deployDNS: () => api.post('/deploy/dns'),
+}
+
+export const clusterApi = {
+  getNodes: () => api.get('/cluster/nodes'),
+  createNode: (data: any) => api.post('/cluster/nodes', data),
+  deleteNode: (id: number) => api.delete(`/cluster/nodes/${id}`),
+  syncConfiguration: () => api.post('/cluster/sync'),
+}
+
+export interface DNSView {
+  id: number
+  name: string
+  match_clients: string
+  recursion: boolean
+  enabled: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ForwardingZone {
+  id: number
+  name: string
+  forwarders: string[]
+  forward: string
+  enabled: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface StubZone {
+  id: number
+  name: string
+  masters: string[]
+  enabled: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ClusterNode {
+  id: number
+  name: string
+  ip_address: string
+  role: string
+  status: string
+  created_at: string
+  updated_at: string
+}

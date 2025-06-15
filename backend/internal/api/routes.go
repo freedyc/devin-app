@@ -72,5 +72,37 @@ func SetupRoutes(router *gin.Engine, cfg *config.Config) {
 			config.GET("/bind9/validate", handlers.ValidateBind9Config)
 			config.GET("/dhcp/validate", handlers.ValidateDHCPConfig)
 		}
+
+		dnsEnhanced := dns.Group("/enhanced")
+		{
+			dnsEnhanced.GET("/views", handlers.GetDNSViews)
+			dnsEnhanced.POST("/views", handlers.CreateDNSView)
+			dnsEnhanced.DELETE("/views/:id", handlers.DeleteDNSView)
+
+			dnsEnhanced.GET("/forwarding-zones", handlers.GetForwardingZones)
+			dnsEnhanced.POST("/forwarding-zones", handlers.CreateForwardingZone)
+			dnsEnhanced.DELETE("/forwarding-zones/:id", handlers.DeleteForwardingZone)
+
+			dnsEnhanced.GET("/stub-zones", handlers.GetStubZones)
+			dnsEnhanced.POST("/stub-zones", handlers.CreateStubZone)
+			dnsEnhanced.DELETE("/stub-zones/:id", handlers.DeleteStubZone)
+
+			dnsEnhanced.GET("/recursion", handlers.GetRecursionConfig)
+			dnsEnhanced.PUT("/recursion", handlers.UpdateRecursionConfig)
+
+			dnsEnhanced.POST("/deploy", handlers.DeployDNSConfiguration)
+		}
+
+		api.POST("/deploy", handlers.DeploySystemConfiguration)
+		api.POST("/deploy/dns", handlers.DeployDNSConfiguration)
+		api.POST("/deploy/dhcp", handlers.DeployDHCPConfiguration)
+
+		cluster := api.Group("/cluster")
+		{
+			cluster.GET("/nodes", handlers.GetClusterNodes)
+			cluster.POST("/nodes", handlers.CreateClusterNode)
+			cluster.DELETE("/nodes/:id", handlers.DeleteClusterNode)
+			cluster.POST("/sync", handlers.SyncClusterConfiguration)
+		}
 	}
 }

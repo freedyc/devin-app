@@ -113,3 +113,104 @@ func WriteNamedConf(configPath string, zones []models.DNSZone) error {
 
 	return os.WriteFile(configPath, []byte(content), 0644)
 }
+
+const enhancedNamedConfTemplate = `options {
+	directory "/var/lib/bind";
+	recursion {{if .Recursion.Enabled}}yes{{else}}no{{end}};
+	{{if .Recursion.AllowRecursion}}allow-recursion { {{range .Recursion.AllowRecursion}}{{.}}; {{end}}};{{end}}
+	listen-on { any; };
+	listen-on-v6 { any; };
+	{{if .Recursion.Forwarders}}forwarders {
+		{{range .Recursion.Forwarders}}{{.}};
+		{{end}}
+	};{{end}}
+	{{if .Recursion.ForwardFirst}}forward first;{{else}}forward only;{{end}}
+	dnssec-validation {{.Recursion.DNSSECValidation}};
+};
+
+logging {
+	channel default_debug {
+		file "data/named.run";
+		severity dynamic;
+	};
+};
+
+{{range .Views}}
+view "{{.Name}}" {
+	match-clients { {{.MatchClients}}; };
+	recursion {{if .Recursion}}yes{{else}}no{{end}};
+	
+	{{range $.Zones}}{{if and .Enabled (eq .ViewID $.ID)}}
+	zone "{{.Name}}" {
+		type {{.ZoneType}};
+		{{if eq .ZoneType "master"}}file "/etc/bind/zones/{{.Name}}.zone";{{end}}
+		{{if eq .ZoneType "slave"}}masters { {{.Masters}}; };{{end}}
+		{{if eq .ZoneType "forward"}}forwarders { {{.Forwarders}}; };{{end}}
+		{{if eq .ZoneType "stub"}}masters { {{.Masters}}; };{{end}}
+	};
+	{{end}}{{end}}
+	
+	{{range $.ForwardingZones}}{{if .Enabled}}
+	zone "{{.Name}}" {
+		type forward;
+		forward {{.Forward}};
+		forwarders { {{range .Forwarders}}{{.}}; {{end}}};
+	};
+	{{end}}{{end}}
+	
+	{{range $.StubZones}}{{if .Enabled}}
+	zone "{{.Name}}" {
+		type stub;
+		masters { {{range .Masters}}{{.}}; {{end}}};
+	};
+	{{end}}{{end}}
+};
+{{end}}
+
+{{if .DefaultZones}}
+{{range .DefaultZones}}{{if .Enabled}}
+zone "{{.Name}}" {
+	type {{.ZoneType}};
+	{{if eq .ZoneType "master"}}file "/etc/bind/zones/{{.Name}}.zone";{{end}}
+	{{if eq .ZoneType "slave"}}masters { {{.Masters}}; };{{end}}
+};
+{{end}}{{end}}
+{{end}}`
+
+type EnhancedNamedConfig struct {
+	Recursion       models.RecursionConfig
+	Views           []models.DNSView
+	Zones           []models.DNSZoneEnhanced
+	ForwardingZones []models.ForwardingZone
+	StubZones       []models.StubZone
+	DefaultZones    []models.DNSZoneEnhanced
+}
+
+func GenerateEnhancedNamedConf(config EnhancedNamedConfig) (string, error) {
+	tmpl, err := template.New("enhanced-named").Parse(enhancedNamedConfTemplate)
+	if err != nil {
+		return "", err
+	}
+
+	var buf strings.Builder
+	err = tmpl.Execute(&buf, config)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
+func WriteEnhancedNamedConf(configPath string, config EnhancedNamedConfig) error {
+	content, err := GenerateEnhancedNamedConf(config)
+	if err != nil {
+		return err
+	}
+
+	dir := filepath.Dir(configPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+
+	return os.WriteFile(configPath, []byte(content), 0644)
+}

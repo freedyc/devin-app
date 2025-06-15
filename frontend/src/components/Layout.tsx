@@ -7,7 +7,9 @@ import {
   Router, 
   Settings, 
   BarChart3,
-  Menu
+  Menu,
+  Server,
+  Layers
 } from 'lucide-react'
 
 interface LayoutProps {
@@ -17,8 +19,10 @@ interface LayoutProps {
 const navigation = [
   { name: 'Dashboard', href: '/', icon: BarChart3 },
   { name: 'DNS Management', href: '/dns', icon: Globe },
+  { name: 'Enhanced DNS', href: '/dns/enhanced', icon: Layers },
   { name: 'DHCP Management', href: '/dhcp', icon: Network },
   { name: 'GSLB Management', href: '/gslb', icon: Router },
+  { name: 'Cluster Management', href: '/cluster', icon: Server },
   { name: 'Configuration', href: '/config', icon: Settings },
 ]
 
