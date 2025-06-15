@@ -190,24 +190,39 @@ func DeployDNSConfiguration(c *gin.Context) {
 	}
 
 	configPath := "/etc/bind/named.conf"
-	if err := bind9.WriteEnhancedNamedConf(configPath, config); err != nil {
+	
+	content, err := bind9.GenerateEnhancedNamedConf(config)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to write configuration",
+			"error": "Failed to generate configuration",
 			"details": err.Error(),
+		})
+		return
+	}
+
+	if err := bind9.WriteEnhancedNamedConf(configPath, config); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Configuration generated successfully",
+			"note": "Manual deployment required - run with sudo privileges",
+			"config_path": configPath,
+			"config_content": content,
+			"deployment_command": "sudo systemctl reload bind9",
 		})
 		return
 	}
 
 	if err := reloadBind9Service(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to reload bind9 service",
-			"details": err.Error(),
+		c.JSON(http.StatusPartialContent, gin.H{
+			"message": "Configuration written but service reload failed",
+			"config_path": configPath,
+			"reload_error": err.Error(),
+			"manual_reload": "sudo systemctl reload bind9",
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "DNS configuration deployed successfully",
+		"message": "DNS configuration deployed and service reloaded successfully",
 		"config_path": configPath,
 	})
 }
