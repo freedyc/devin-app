@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus, Edit, Trash2, Globe } from 'lucide-react'
+import { Plus, Trash2, Globe } from 'lucide-react'
 import { dnsApi, type DNSZone, type DNSRecord } from '@/services/api'
 
 export default function DNSManagement() {
@@ -7,8 +7,7 @@ export default function DNSManagement() {
   const [selectedZone, setSelectedZone] = useState<DNSZone | null>(null)
   const [records, setRecords] = useState<DNSRecord[]>([])
   const [loading, setLoading] = useState(true)
-  const [showZoneForm, setShowZoneForm] = useState(false)
-  const [showRecordForm, setShowRecordForm] = useState(false)
+
 
   useEffect(() => {
     fetchZones()
@@ -92,7 +91,6 @@ export default function DNSManagement() {
                 DNS Zones
               </h3>
               <button
-                onClick={() => setShowZoneForm(true)}
                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="h-4 w-4 mr-1" />
@@ -163,7 +161,6 @@ export default function DNSManagement() {
               </h3>
               {selectedZone && (
                 <button
-                  onClick={() => setShowRecordForm(true)}
                   className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
                 >
                   <Plus className="h-4 w-4 mr-1" />

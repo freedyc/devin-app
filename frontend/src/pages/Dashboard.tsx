@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Globe, Network, Router, Activity } from 'lucide-react'
-import { dnsApi, dhcpApi, gslbApi, type DNSZone, type DHCPScope, type GSLBPolicy } from '@/services/api'
+import { dnsApi, dhcpApi, gslbApi } from '@/services/api'
 
 export default function Dashboard() {
   const [stats, setStats] = useState({

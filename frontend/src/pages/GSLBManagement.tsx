@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus, Edit, Trash2, Router, Server } from 'lucide-react'
+import { Plus, Trash2, Router, Server } from 'lucide-react'
 import { gslbApi, type GSLBPolicy, type GSLBPool, type GSLBServer } from '@/services/api'
 
 export default function GSLBManagement() {

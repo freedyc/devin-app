@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus, Edit, Trash2, Network, Monitor } from 'lucide-react'
+import { Plus, Trash2, Network, Monitor } from 'lucide-react'
 import { dhcpApi, type DHCPScope, type DHCPReservation, type DHCPLease } from '@/services/api'
 
 export default function DHCPManagement() {
